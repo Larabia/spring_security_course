@@ -2,6 +2,8 @@ package com.larabia.springSecurityCourse.config;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
@@ -20,10 +23,39 @@ public class JwtService {
     // En su lugar, se recomienda almacenarla en un gestor de secretos (por ejemplo, AWS Secrets Manager, HashiCorp Vault, etc.).
 	private static final String SECRET_KEY = "01234527aa08e384029f7dcd740e80cc7555f904e322b9edbd3c9d3ca78f97c5";
 	
-	/*public String generateToken(Map<String, Claims> extraClaims, UserDetails userDetails) {
 	
+	
+	//METODOS PARA GENERARLE UN TOKEN AL CLIENTE
+    /**
+     * Genera un token JWT utilizando la información del usuario proporcionada.
+     * Este método llama internamente al método {@link #generateToken(Map, UserDetails)} 
+     * con un mapa vacío de claims adicionales.
+     *
+     * @param userDetails   Información del usuario para establecer el subject del token.
+     * @return              Un token JWT firmado y listo para ser utilizado.
+     */
+	public String generateToken(UserDetails userDetails) {
+		return generateToken(new HashMap<>(),userDetails);
+		
+	}
+	
+	/**
+	 * Genera un token JWT con los claims adicionales proporcionados y la información del usuario.
+	 *
+	 * @param extraClaims   Un mapa de claims adicionales que se incluirán en el token.
+	 * @param userDetails   Información del usuario para establecer el subject del token.
+	 * @return              Un token JWT firmado y listo para ser utilizado.
+	 */
+	public String generateToken(Map<String, Claims> extraClaims, UserDetails userDetails) {
+	
+		return Jwts.builder().setClaims(extraClaims)// Agrega los claims adicionales proporcionados en el mapa extraClaims.
+				.setSubject(userDetails.getUsername())// Establece el "subject" del token como el nombre de usuario del usuario autenticado.
+				.setIssuedAt(new Date(System.currentTimeMillis()))// Define la fecha de emisión del token como la hora actual del sistema.
+				.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 240)) // Define la fecha de expiración del token (4 horas después de la emisión).
+				.signWith(getSingInKey(), SignatureAlgorithm.HS256) // Firma el token con la clave secreta usando el algoritmo HS256.
+				.compact();
 				
-	}*/
+	}
 
 	
 	
