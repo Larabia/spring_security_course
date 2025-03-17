@@ -1,5 +1,7 @@
 package com.larabia.springSecurityCourse.config;
 
+
+
 import java.io.IOException;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,7 +38,7 @@ public class JwtFilter extends OncePerRequestFilter{
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request, 
 									@NonNull HttpServletResponse response, 
-									@NonNull FilterChain filterChain) throws ServletException, IOException {
+									@NonNull FilterChain filterChain) throws IOException, ServletException{
 		final String authHeader = request.getHeader("Authorization");// Recupera el encabezado de autorización de la solicitud HTTP.
 		final String jwt;
 		final String userEmail;
