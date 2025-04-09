@@ -1,6 +1,7 @@
 package com.larabia.springSecurityCourse.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -9,6 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,13 +36,6 @@ public class SecurityConfig {
 	private final AuthenticationProvider authenticationProvider;
 
 
-    public SecurityConfig(JwtFilter jwtFilter, AuthenticationProvider authenticationProvider) {
-		super();
-		this.jwtFilter = jwtFilter;
-		this.authenticationProvider = authenticationProvider;
-	}
-
-
 
     /**
      * Configura la cadena de filtros de seguridad (SecurityFilterChain).
@@ -53,7 +49,7 @@ public class SecurityConfig {
 		
 		httpSecurity.csrf(csrf -> csrf.disable())// Desactiva la protección CSRF, útil en APIs REST donde no se usa sesión.
 				.authorizeHttpRequests(auth -> auth  // Define reglas de autorización para las solicitudes HTTP.
-						.requestMatchers("").permitAll()// Ssolicitudes que NO requieren autenticación.
+						.requestMatchers(publicEndpoints()).permitAll()// Ssolicitudes que NO requieren autenticación.
 						.anyRequest().authenticated())// Todas las demás solicitudes requieren autenticación.
 				.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))// Configura la gestión de sesiones como STATELESS (sin estado).
 	            																					   // Esto es clave en autenticaciones con JWT, ya que no se almacenan sesiones en el servidor.
@@ -63,6 +59,12 @@ public class SecurityConfig {
 		// Construye y retorna la cadena de seguridad configurada.
 		return httpSecurity.build();
 		
+	}
+	
+	private RequestMatcher publicEndpoints() {
+		return new OrRequestMatcher(
+				new AntPathRequestMatcher("/api/greeting/sayHelloPublic"), 
+				new AntPathRequestMatcher("/api/auth/**"));
 	}
 	
 	

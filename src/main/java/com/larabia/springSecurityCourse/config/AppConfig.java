@@ -2,8 +2,10 @@ package com.larabia.springSecurityCourse.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,12 +33,6 @@ public class AppConfig {
 	
 	private final UserRepository userRepository;
 	
-	
-	
-	public AppConfig(UserRepository userRepository) {
-		super();
-		this.userRepository = userRepository;
-	}
 
 
     /**
@@ -92,6 +88,27 @@ public class AppConfig {
 	public PasswordEncoder passwordEncoder() {
 
 		return new BCryptPasswordEncoder();
+	}
+	
+	
+    /**
+     * Define un bean de tipo AuthenticationManager.
+     * 
+     * El AuthenticationManager es una interfaz central en Spring Security que se encarga de 
+     * gestionar el proceso de autenticación. En este caso, se obtiene desde la configuración 
+     * global de autenticación proporcionada por Spring a través del objeto AuthenticationConfiguration.
+     * 
+     * Esto permite que Spring inyecte automáticamente todos los componentes necesarios
+     * (como el AuthenticationProvider) para construir el AuthenticationManager.
+     * 
+     * @param config La configuración de autenticación proporcionada por Spring.
+     * @return Un AuthenticationManager configurado con el AuthenticationProvider definido previamente.
+     * @throws Exception En caso de que ocurra un error al obtener el AuthenticationManager.
+     */
+	@Bean 
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+		
+		return config.getAuthenticationManager();
 	}
 				
 		

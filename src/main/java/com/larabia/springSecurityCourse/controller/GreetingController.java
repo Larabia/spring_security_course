@@ -8,10 +8,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/greeting")
 public class GreetingController {
 	
-	@GetMapping("/sayHello")
+	@GetMapping("/sayHelloPublic")
 	public String sayHello(){
 		return "Hello from api";
 	}
+	
+	@GetMapping("/sayHelloProtected")
+	public String sayHelloProtected(){
+		return "Hello from api protected";
+	}
+
 
 }
 
