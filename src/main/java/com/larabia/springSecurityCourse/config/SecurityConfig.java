@@ -49,7 +49,8 @@ public class SecurityConfig {
 		
 		httpSecurity.csrf(csrf -> csrf.disable())// Desactiva la protección CSRF, útil en APIs REST donde no se usa sesión.
 				.authorizeHttpRequests(auth -> auth  // Define reglas de autorización para las solicitudes HTTP.
-						.requestMatchers(publicEndpoints()).permitAll()// Ssolicitudes que NO requieren autenticación.
+					    .requestMatchers("/api/greeting/sayHelloAdmin/**").hasRole("ADMIN") // solo visible para usuarios admin
+						.requestMatchers(publicEndpoints()).permitAll()// Solicitudes que NO requieren autenticación.
 						.anyRequest().authenticated())// Todas las demás solicitudes requieren autenticación.
 				.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))// Configura la gestión de sesiones como STATELESS (sin estado).
 	            																					   // Esto es clave en autenticaciones con JWT, ya que no se almacenan sesiones en el servidor.

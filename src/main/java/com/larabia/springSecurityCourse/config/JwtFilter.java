@@ -55,6 +55,8 @@ public class JwtFilter extends OncePerRequestFilter{
 
             // Carga los detalles del usuario a partir del email utilizando el UserDetailsService. 
 			UserDetails userDetails = this.userDetailService.loadUserByUsername(userEmail);
+			System.out.println("✅ Usuario cargado: " + userDetails.getUsername());
+			System.out.println("🛡️ Roles del usuario: " + userDetails.getAuthorities());
 			
 			
             // Valida el token JWT utilizando el jwtService. Si es válido, crea un objeto de autenticación.
@@ -72,6 +74,9 @@ public class JwtFilter extends OncePerRequestFilter{
 				
                 // Establece el token de autenticación en el contexto de seguridad de Spring.
 				SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+				
+			    System.out.println("🎯 Autenticado como: " + userDetails.getUsername());
+			    System.out.println("🎯 Con roles: " + userDetails.getAuthorities());
 			}
 		}
 		

@@ -47,8 +47,8 @@ public class User implements UserDetails{
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		// TODO Auto-generated method stub
-		return List.of(new SimpleGrantedAuthority(role.name()));
+		//Spring automáticamente espera que los roles empiecen con "ROLE_", por lo tanto automáticamente se le asigna ROLE_ADMIN como autoridad y podrá acceder al endpoint protegido con .hasRole("ADMIN")
+		return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
 	}
 	@Override
 	public String getPassword() {

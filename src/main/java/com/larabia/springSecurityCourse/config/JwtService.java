@@ -35,7 +35,9 @@ public class JwtService {
      * @return              Un token JWT firmado y listo para ser utilizado.
      */
 	public String generateToken(UserDetails userDetails) {
-		return generateToken(new HashMap<>(),userDetails);
+		Map<String, Object> extraClaims = new HashMap<>();
+	    extraClaims.put("role", userDetails.getAuthorities().iterator().next().getAuthority());
+	    return generateToken(extraClaims, userDetails);
 		
 	}
 	
@@ -46,7 +48,7 @@ public class JwtService {
 	 * @param userDetails   Información del usuario para establecer el subject del token.
 	 * @return              Un token JWT firmado y listo para ser utilizado.
 	 */
-	public String generateToken(Map<String, Claims> extraClaims, UserDetails userDetails) {
+	public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {//Map<String, Claims> no es válido. De hecho, Claims es lo que devolvés cuando decodificás un JWT, no lo que le pasás al construirlo.
 	
 		return Jwts.builder().setClaims(extraClaims)// Agrega los claims adicionales proporcionados en el mapa extraClaims.
 				.setSubject(userDetails.getUsername())// Establece el "subject" del token como el nombre de usuario del usuario autenticado.
