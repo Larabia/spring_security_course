@@ -4,14 +4,25 @@ package com.larabia.springSecurityCourse.config;
 
 import java.io.IOException;
 
+
+import org.springframework.http.HttpStatus;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+
 import org.springframework.web.filter.OncePerRequestFilter;
 
+
+import com.larabia.springSecurityCourse.exeption.ExceptionUtil;
+
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import io.micrometer.common.lang.NonNull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -47,8 +58,23 @@ public class JwtFilter extends OncePerRequestFilter{
 		jwt = authHeader.substring(7);
 		
 		
+		//Este try catch lo agregamos manualmente para que las excepciones por token invalido lleguen al @ControllerAdvice de GlobalExceptionHandler
+		try {
         // Extrae el token JWT del encabezado de autorización (eliminando "Bearer ").
 		userEmail = jwtService.getUserName(jwt);
+		} catch (ExpiredJwtException e) {
+		    ExceptionUtil.writeErrorResponse(response, HttpStatus.UNAUTHORIZED, "Sesion expirada. Iniciá sesión nuevamente.");
+		    return;
+		} catch (SignatureException e) {
+		    ExceptionUtil.writeErrorResponse(response, HttpStatus.UNAUTHORIZED, "Token inválido: firma incorrecta.");
+		    return;
+		} catch (MalformedJwtException e) {
+		    ExceptionUtil.writeErrorResponse(response, HttpStatus.BAD_REQUEST, "Token mal formado.");
+		    return;
+		} catch (JwtException e) {
+		    ExceptionUtil.writeErrorResponse(response, HttpStatus.UNAUTHORIZED, "Token no válido.");
+		    return;
+		}
 		
         // Verifica si el email del usuario es válido y si el usuario no ha sido autenticado previamente.
 		if(userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {

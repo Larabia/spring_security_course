@@ -11,6 +11,8 @@ import com.larabia.springSecurityCourse.controller.models.AuthenticationRequest;
 import com.larabia.springSecurityCourse.controller.models.RegisterRequest;
 import com.larabia.springSecurityCourse.entity.Role;
 import com.larabia.springSecurityCourse.entity.User;
+import com.larabia.springSecurityCourse.exeption.EmailAlreadyExistsException;
+import com.larabia.springSecurityCourse.exeption.UserNotFoundException;
 import com.larabia.springSecurityCourse.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -31,7 +33,7 @@ public class AuthServiceImpl implements AuthService {
 	
 	// Repositorio para acceder a los datos de usuarios en la base de datos.
 	private final UserRepository userRepository;
-	// Codificador de contraseñas, se usa para encriptar antes de guardar y para validar al autenticar.
+	// Codificador de contraseñas, se usa para encriptar antes de guardar y para validar al autenticar (Bcrypt) (que lo demuestre).
 	private final PasswordEncoder passwordEncoder;
 	// Servicio encargado de generar tokens JWT.
 	private final JwtService jwtService;
@@ -53,6 +55,12 @@ public class AuthServiceImpl implements AuthService {
 	 */
 	@Override
 	public AuthResponse register(RegisterRequest request) {
+		
+		//Valida que el mail no haya sido registrado previamente
+	    if (userRepository.findUserByEmail(request.getEmail()).isPresent()) {
+	        throw new EmailAlreadyExistsException("Ya existe un usuario con el email: " + request.getEmail());
+	    }
+	    
 		var user = User.builder()
 			    .firstName(request.getFirstName())
 			    .lastName(request.getLastName())
@@ -90,7 +98,7 @@ public class AuthServiceImpl implements AuthService {
 		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 		
 		// Busca al usuario en la base de datos. Se usa el email desde el request.
-		var user = userRepository.findUserByEmail(request.getEmail()).orElseThrow();
+		var user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(() -> new UserNotFoundException("No se encontró un usuario con el email: " + request.getEmail()));
 		
 		// Genera el token JWT usando los datos del usuario autenticado y que se devolvio de la base de datos (nunca del request no es seguro) 
 		var jwtToken = jwtService.generateToken(user);

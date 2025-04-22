@@ -37,7 +37,7 @@ public class JwtService {
 	public String generateToken(UserDetails userDetails) {
 		Map<String, Object> extraClaims = new HashMap<>();
 	    extraClaims.put("role", userDetails.getAuthorities().iterator().next().getAuthority());
-	    return generateToken(extraClaims, userDetails);
+		return generateToken(new HashMap<>(),userDetails);
 		
 	}
 	
@@ -53,7 +53,7 @@ public class JwtService {
 		return Jwts.builder().setClaims(extraClaims)// Agrega los claims adicionales proporcionados en el mapa extraClaims.
 				.setSubject(userDetails.getUsername())// Establece el "subject" del token como el nombre de usuario del usuario autenticado.
 				.setIssuedAt(new Date(System.currentTimeMillis()))// Define la fecha de emisión del token como la hora actual del sistema.
-				.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // Define la fecha de expiración del token (24 horas después de la emisión).
+				.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60)) //* 60 * 24)) // Define la fecha de expiración del token (24 horas después de la emisión).
 				.signWith(getSingInKey(), SignatureAlgorithm.HS256) // Firma el token con la clave secreta usando el algoritmo HS256.
 				.compact();
 				
