@@ -27,7 +27,7 @@ public class GreetingController {
 	}
 	
 	@GetMapping("/sayHelloModeration")
-	@PreAuthorize("hasAnyRole('MODERATOR', 'ADMIN')")
+	@PreAuthorize("hasAnyRole('MODERADOR', 'ADMIN')")
 	public String sayHelloModeration() {
 	    return "👮 ¡Hola Moderador o Admin!";
 	}

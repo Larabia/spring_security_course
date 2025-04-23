@@ -1,5 +1,7 @@
 package com.larabia.springSecurityCourse.service;
 
+import java.util.Set;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -66,7 +68,7 @@ public class AuthServiceImpl implements AuthService {
 			    .lastName(request.getLastName())
 			    .email(request.getEmail())
 			    .password(passwordEncoder.encode(request.getPassword()))// encripta la contraseña
-			    .role(Role.USER)// asigna rol por defecto
+			    .roles(Set.of(Role.USER)) // asigna rol USER por defecto
 			    .build();
 		
 		userRepository.save(user);// guarda el usuario en la base de datos

@@ -2,6 +2,7 @@ package com.larabia.springSecurityCourse.entity;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -31,24 +32,20 @@ public class User implements UserDetails{
 	private String email;
 	private String password;
 	
-	@Enumerated(EnumType.ORDINAL)
-	private Role role;
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+	@Column(name = "role")
+	@Enumerated(EnumType.STRING)
+	private Set<Role> roles;
 	
 	
-	
-	public User(String firstName, String lastName, String email, String password, Role role) {
-		super();
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.email = email;
-		this.password = password;
-		this.role = role;
-	}
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		//Spring automáticamente espera que los roles empiecen con "ROLE_", por lo tanto automáticamente se le asigna ROLE_ADMIN como autoridad y podrá acceder al endpoint protegido con .hasRole("ADMIN")
-		return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+	    return roles.stream()
+	            .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
+	            .toList();
 	}
 	@Override
 	public String getPassword() {
@@ -60,52 +57,6 @@ public class User implements UserDetails{
 		// TODO Auto-generated method stub
 		return email;
 	}
-
-	
-	
-	
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public Role getRole() {
-		return role;
-	}
-
-	public void setRole(Role role) {
-		this.role = role;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	
-	
-	
-	
-	
-	
-	
 	
 
 }
