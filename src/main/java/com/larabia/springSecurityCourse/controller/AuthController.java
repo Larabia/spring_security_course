@@ -12,6 +12,7 @@ import com.larabia.springSecurityCourse.controller.models.AuthenticationRequest;
 import com.larabia.springSecurityCourse.controller.models.RegisterRequest;
 import com.larabia.springSecurityCourse.service.AuthService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -23,14 +24,14 @@ public class AuthController {
 	private AuthService authService;
 	
 	@PostMapping("/register")
-	public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request){
+	public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request){
 		
 		return ResponseEntity.ok(authService.register(request));
 		
 	}
 	
 	@PostMapping("/authenticate")
-	public ResponseEntity<AuthResponse> autenticate(@RequestBody AuthenticationRequest request){
+	public ResponseEntity<AuthResponse> autenticate(@Valid @RequestBody AuthenticationRequest request){
 		
 		return ResponseEntity.ok(authService.autenticate(request));
 		
