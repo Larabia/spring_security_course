@@ -1,5 +1,6 @@
 package com.larabia.springSecurityCourse.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.context.annotation.Configuration;
@@ -30,10 +31,18 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 	
 	// Filtro para manejar la autenticación basada en JWT.
-	private final JwtFilter jwtFilter;
+	@Autowired
+	private JwtFilter jwtFilter;
 	
 	// Proveedor de autenticación que maneja la validación de credenciales.
-	private final AuthenticationProvider authenticationProvider;
+	@Autowired
+	private AuthenticationProvider authenticationProvider;
+	
+	@Autowired
+	private CustomAccessDeniedHandler accessDeniedHandler;
+
+	@Autowired
+	private CustomAuthenticationEntryPoint authenticationEntryPoint;
 
 
 
@@ -55,8 +64,10 @@ public class SecurityConfig {
 				.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))// Configura la gestión de sesiones como STATELESS (sin estado).
 	            																					   // Esto es clave en autenticaciones con JWT, ya que no se almacenan sesiones en el servidor.
 				.authenticationProvider(authenticationProvider)// Establece el proveedor de autenticación definido en la configuración.
-				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);// Agrega el filtro JWT antes del filtro `UsernamePasswordAuthenticationFilter`.
-        																				// Esto permite validar el token antes de que Spring intente autenticar al usuario por nombre de usuario y contraseña.
+				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)// Agrega el filtro JWT antes del filtro `UsernamePasswordAuthenticationFilter`.
+        .exceptionHandling(exception -> exception //Maneja excepciones del filter chain generadas en la validacion de tokens
+                .accessDeniedHandler(accessDeniedHandler)
+                .authenticationEntryPoint(authenticationEntryPoint));																			
 		// Construye y retorna la cadena de seguridad configurada.
 		return httpSecurity.build();
 		

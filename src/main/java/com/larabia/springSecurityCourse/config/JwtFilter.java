@@ -55,26 +55,11 @@ public class JwtFilter extends OncePerRequestFilter{
 		}
 		
 		//se le sacan al token los 7 caracteres de "bearer" mas un espacio, luego viene e token
-		jwt = authHeader.substring(7);
-		
-		
-		//Este try catch lo agregamos manualmente para que las excepciones por token invalido lleguen al @ControllerAdvice de GlobalExceptionHandler
-		try {
+		jwt = authHeader.substring(7);		
+
         // Extrae el token JWT del encabezado de autorización (eliminando "Bearer ").
 		userEmail = jwtService.getUserName(jwt);
-		} catch (ExpiredJwtException e) {
-		    ExceptionUtil.writeErrorResponse(response, HttpStatus.UNAUTHORIZED, "Sesion expirada. Iniciá sesión nuevamente.");
-		    return;
-		} catch (SignatureException e) {
-		    ExceptionUtil.writeErrorResponse(response, HttpStatus.UNAUTHORIZED, "Token inválido: firma incorrecta.");
-		    return;
-		} catch (MalformedJwtException e) {
-		    ExceptionUtil.writeErrorResponse(response, HttpStatus.BAD_REQUEST, "Token mal formado.");
-		    return;
-		} catch (JwtException e) {
-		    ExceptionUtil.writeErrorResponse(response, HttpStatus.UNAUTHORIZED, "Token no válido.");
-		    return;
-		}
+		
 		
         // Verifica si el email del usuario es válido y si el usuario no ha sido autenticado previamente.
 		if(userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
